@@ -21,12 +21,12 @@ void PortScanner::isOpen()
 {
     if (connect(this->sfd, this->result->ai_addr, this->result->ai_addrlen) != -1)
     {
-        std::cout << "SUCCESS!" << std::endl;
-        getsockname(sfd,this->result->ai_addr,&this->result->ai_addrlen);
+        std::cout << "Open port -> " << this->port << std::endl;
+//        getsockname(sfd,this->result->ai_addr,&this->result->ai_addrlen);
     }
     else
     {
-        std::cout << "Failed :( !" << std::endl;
+        std::cout << "Failed connect to port -> " << this->port << std::endl;
     }
 }
 PortScanner::~PortScanner()
