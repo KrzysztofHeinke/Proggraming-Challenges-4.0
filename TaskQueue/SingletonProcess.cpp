@@ -16,6 +16,7 @@ SingletonProcess::SingletonProcess(uint16_t port0)
         {
             close(socket_fd);
         }
+        delete queue;
     }
 
     std::string SingletonProcess::GetLockFileName()
@@ -28,7 +29,7 @@ SingletonProcess::SingletonProcess(uint16_t port0)
         {
             socket_fd = -1;
             rc = 1;
-
+            queue = new TaskQueue;
             if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
             {
                 throw std::runtime_error(std::string("Could not create socket: ") +  strerror(errno));
@@ -51,8 +52,7 @@ SingletonProcess::SingletonProcess(uint16_t port0)
       name.sin_port = htons (port);
       name.sin_addr.s_addr = htonl (INADDR_ANY);
       rc = connect(socket_fd, (struct sockaddr *) &name, sizeof (name));
-      send(socket_fd, task.c_str() , strlen(task.c_str()) , 0 );
-      std::cout << "HELLO FROM SOCKET" << task << std::endl;
+      std::cout << send(socket_fd, task.c_str() , strlen(task.c_str()) , 0 ) << std::endl;
     }
     std::string SingletonProcess::listenForTask()
     {
@@ -61,16 +61,16 @@ SingletonProcess::SingletonProcess(uint16_t port0)
       name.sin_port = htons (port);
       name.sin_addr.s_addr = htonl (INADDR_ANY);
       listen(socket_fd, 3);
-      int new_socket = accept(socket_fd, (struct sockaddr *)&name, (socklen_t*)&name );
+      accept(socket_fd, (struct sockaddr *)&name, (socklen_t*)&name );
       char buffer[1024] = {0};
       std::string data;
       try
       {
-        data = read( new_socket , buffer, 1024); 
+        data = read( socket_fd , buffer, 1024); 
       }
       catch(const std::exception& e)
       {
-        data = "";
+        std::cout << "Nothing to ead from socket" << std::endl;
       }
       
       return buffer;
