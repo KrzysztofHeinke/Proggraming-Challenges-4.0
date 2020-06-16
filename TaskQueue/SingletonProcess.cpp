@@ -70,7 +70,7 @@ SingletonProcess::SingletonProcess(uint16_t port0)
       }
       catch(const std::exception& e)
       {
-        std::cout << "Nothing to ead from socket" << std::endl;
+        std::cout << "Nothing to read from socket" << std::endl;
       }
       
       return buffer;
