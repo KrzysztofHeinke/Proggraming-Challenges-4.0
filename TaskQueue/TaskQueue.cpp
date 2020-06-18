@@ -7,13 +7,22 @@
 #include "TaskQueue.h"
 #include <chrono>
 #include <sstream>
+#include <stdio.h>
+#include <fcntl.h>
+#include <fstream>
 
-int TaskQueue::startTask(std::string Task, int taskNumber)
+void TaskQueue::saveOutputToFile(std::string LogName)
+{
+  std::ofstream outfile;
+  outfile.open(LogName);
+
+}
+
+int TaskQueue::startTask(std::string Task, std::string logName)
 {
   
   pid_t pid;
   std::cout << "My process id = " << getpid() << std::endl;
-  // history[taskNumber].state = "running";
   pid = fork();
 
   if ( pid == -1 )
@@ -21,13 +30,17 @@ int TaskQueue::startTask(std::string Task, int taskNumber)
       std::cout << "Error in fork";
   }
   else if ( pid == 0 )
-  {
+  { 
+    //std::ofstream file;
+    
     std::cout << "Child process: My process id = " << getpid() << std::endl;
     std::cout << "Child process: Value returned by fork() = " << pid << std::endl;
+
+    Task = Task + " > " + logName;
     int return_value = system(Task.c_str());
+    
     if ( return_value != 0 )
     {
-      history[taskNumber].exitNumber = return_value;
       exit(return_value);
     }
     return return_value;
@@ -78,8 +91,9 @@ void TaskQueue::  historyEntryCreate(std::string Task)
     entry.startTime = ss.str();
     entry.state = "queued";
     entry.logFile = "/tmp/" + logName + ".out";
-    startTask(Task, entry.number);
     history.push_back(entry);
+    startTask(Task, entry.logFile);
+    
 }
 
 void historyEntry::printEntry()

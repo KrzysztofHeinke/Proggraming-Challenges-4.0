@@ -21,9 +21,10 @@ class TaskQueue
 private:
     
 public:
+    void saveOutputToFile(std::string Logname);
     std::vector <historyEntry> history;
     TaskQueue();
-    int startTask(std::string Task, int taskNumber);
+    int startTask(std::string Task, std::string logName);
     void historyEntryCreate(std::string Task);
     ~TaskQueue();
 };

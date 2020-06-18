@@ -10,7 +10,6 @@ int main(int argc, char * argv[])
     
     if (!singleton())
     {
-      //std::cerr << "process running already. See " << singleton.GetLockFileName() << std::endl;
       std::string command;
       for (int i = 1; i < argc; i++)
       {
@@ -32,7 +31,6 @@ int main(int argc, char * argv[])
       }
       else if ( data.length() == 0 )
       {
-        std::cout << "HELLO" << std::endl;
         std::cout << "size of queue " << singleton.queue->history.size() << std::endl;
         for (auto it = singleton.queue->history.begin(); it != singleton.queue->history.end(); ++it)
         {
