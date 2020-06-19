@@ -96,19 +96,14 @@ void TaskQueue::  historyEntryCreate(std::string Task)
     
 }
 
-void historyEntry::printEntry()
+
+std::string historyEntry::printEntry()
 {
-    std::cout << this->number<< " " ;
-    std::cout << this->exitNumber << " ";
-    std::cout << this->logFile << " ";
-    std::cout << this->startTime << " ";
-    std::cout << this->endTime << " ";
-    std::cout << this->time << " ";
-    std::cout << this->command << " ";
-    std::cout << this->date << " ";
-    std::cout << this->state << " ";
-    std::cout << std::endl;
+  return (std::to_string(this->number) + " " + std::to_string(this->exitNumber) + " " + this->logFile + " " + 
+  this->startTime + " " + this->endTime + " " + this->time + " " + 
+  this->command + " " + this->date + " " + this->state );
 }
+
 
 TaskQueue::~TaskQueue()
 {

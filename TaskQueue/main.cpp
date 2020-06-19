@@ -1,7 +1,14 @@
 #include <string>
 #include <iostream>
 #include "SingletonProcess.h"
-
+void printHistory(SingletonProcess &singleton)
+{
+  system("echo \"Task number, exit status, Log localization, date, command, status\" > /tmp/TaskHistory.txt");
+  for (auto it = singleton.queue->history.begin(); it != singleton.queue->history.end(); ++it)
+  {
+    system(("echo \"" + it->printEntry() + "\" >> /tmp/TaskHistory.txt").c_str());
+  }
+}
 
 int main(int argc, char * argv[])
 {
@@ -16,8 +23,14 @@ int main(int argc, char * argv[])
         command.append(argv[i]);
         command.append(" ");
       }
+
+      if (command.length() == 0)
+      {
+        system("cat /tmp/TaskHistory.txt");
+      }
       singleton.connectToSocket(command);
-      return 1;
+      
+      return 0;
     }
    
     while (true)
@@ -28,14 +41,11 @@ int main(int argc, char * argv[])
       {
         std::cout << data << std::endl;
         singleton.queue->historyEntryCreate(data);
+        printHistory(singleton);
       }
       else if ( data.length() == 0 )
       {
-        std::cout << "size of queue " << singleton.queue->history.size() << std::endl;
-        for (auto it = singleton.queue->history.begin(); it != singleton.queue->history.end(); ++it)
-        {
-          it->printEntry();
-        }
+        printHistory(singleton);
       }
       
     }

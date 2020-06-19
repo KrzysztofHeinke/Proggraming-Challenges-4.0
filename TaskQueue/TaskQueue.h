@@ -4,7 +4,7 @@
 
 struct historyEntry
 {   
-    void printEntry();
+    std::string printEntry();
     int number;
     int exitNumber;
     std::string logFile;
