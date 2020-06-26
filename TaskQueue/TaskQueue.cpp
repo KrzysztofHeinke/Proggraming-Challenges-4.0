@@ -15,7 +15,6 @@ void TaskQueue::saveOutputToFile(std::string LogName)
 {
   std::ofstream outfile;
   outfile.open(LogName);
-
 }
 
 int TaskQueue::startTask(std::string Task, std::string logName)
@@ -31,31 +30,19 @@ int TaskQueue::startTask(std::string Task, std::string logName)
   }
   else if ( pid == 0 )
   { 
-    //std::ofstream file;
-    
     std::cout << "Child process: My process id = " << getpid() << std::endl;
     std::cout << "Child process: Value returned by fork() = " << pid << std::endl;
 
     Task = Task + " > " + logName;
     int return_value = system(Task.c_str());
-    
-    if ( return_value != 0 )
-    {
-      exit(return_value);
-    }
-    return return_value;
+    exit(return_value);
   }
   else
   {
     std::cout << "Parent process. My process id = " << getpid() << std::endl;
     std::cout << "Parent process. Value returned by fork() = " << pid << std::endl;
   }
-  if (wait(NULL) == -1)
-  {
-    std::cout << "Error in fork";
-  }
-   
- 
+
   return 0;
 }
 
@@ -76,7 +63,7 @@ void randomLogName(std::string &logName)
     }
 
 }
-void TaskQueue::  historyEntryCreate(std::string Task)
+void TaskQueue::historyEntryCreate(std::string Task)
 {
     historyEntry entry;
     std::string logName;
@@ -93,7 +80,6 @@ void TaskQueue::  historyEntryCreate(std::string Task)
     entry.logFile = "/tmp/" + logName + ".out";
     history.push_back(entry);
     startTask(Task, entry.logFile);
-    
 }
 
 
@@ -102,6 +88,7 @@ std::string historyEntry::printEntry()
   return (std::to_string(this->number) + " " + std::to_string(this->exitNumber) + " " + this->logFile + " " + 
   this->startTime + " " + this->endTime + " " + this->time + " " + 
   this->command + " " + this->date + " " + this->state );
+  
 }
 
 

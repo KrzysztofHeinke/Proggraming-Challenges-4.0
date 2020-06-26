@@ -23,6 +23,9 @@ private:
 public:
     void saveOutputToFile(std::string Logname);
     std::vector <historyEntry> history;
+    std::vector <historyEntry> queued;
+    std::vector <historyEntry> finished;
+    
     TaskQueue();
     int startTask(std::string Task, std::string logName);
     void historyEntryCreate(std::string Task);
