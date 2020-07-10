@@ -1,6 +1,13 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/containers/vector.hpp>
+#include <boost/interprocess/allocators/allocator.hpp>
+
+using namespace boost::interprocess;
+typedef allocator<int, managed_shared_memory::segment_manager>  ShmemAllocator;
+typedef std::vector<int, ShmemAllocator> ShmVector;
 
 struct historyEntry
 {   
@@ -25,9 +32,10 @@ public:
     std::vector <historyEntry> history;
     std::vector <historyEntry> queued;
     std::vector <historyEntry> finished;
-    
+    void lock();
+    void unlock();
     TaskQueue();
-    int startTask(std::string Task, std::string logName);
+    int startTask(std::string Task, historyEntry &entry);
     void historyEntryCreate(std::string Task);
     ~TaskQueue();
 };

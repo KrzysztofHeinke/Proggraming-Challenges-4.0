@@ -4,6 +4,8 @@
 #include <iostream>
 #include "SingletonProcess.h"
 #include <string>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 
 SingletonProcess::SingletonProcess(uint16_t port0)
   : socket_fd(-1), rc(1), port(port0)
@@ -14,9 +16,13 @@ SingletonProcess::SingletonProcess(uint16_t port0)
     {
         if (socket_fd != -1)
         {
-            close(socket_fd);
+          close(socket_fd);
+          // shared_memory_object::remove("TaskQueueuShm");
+          // delete segment;
+          // delete alloc_inst;
         }
         delete queue;
+
     }
 
     std::string SingletonProcess::GetLockFileName()
@@ -25,25 +31,39 @@ SingletonProcess::SingletonProcess(uint16_t port0)
     }
     bool SingletonProcess::operator()()
     {
-        if (socket_fd == -1 || rc)
+      if (socket_fd == -1 || rc)
+      {
+        
+        socket_fd = -1;
+        rc = 1;
+        queue = new TaskQueue;
+        if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
         {
-            socket_fd = -1;
-            rc = 1;
-            queue = new TaskQueue;
-            if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-            {
-                throw std::runtime_error(std::string("Could not create socket: ") +  strerror(errno));
-            }
-            else
-            {
-                struct sockaddr_in name;
-                name.sin_family = AF_INET;
-                name.sin_port = htons (port);
-                name.sin_addr.s_addr = htonl (INADDR_ANY);
-                rc = bind (socket_fd, (struct sockaddr *) &name, sizeof (name));
-            }
+            throw std::runtime_error(std::string("Could not create socket: ") +  strerror(errno));
         }
-        return (socket_fd != -1 && rc == 0);
+        else
+        {   
+          std::cout << "HEJKTA2" << std::endl;
+          struct sockaddr_in name;
+          name.sin_family = AF_INET;
+          name.sin_port = htons (port);
+          name.sin_addr.s_addr = htonl (INADDR_ANY);
+          rc = bind (socket_fd, (struct sockaddr *) &name, sizeof (name));
+        }
+      }
+      if ((socket_fd != -1 && rc == 0))
+      {
+        shared_memory_object::remove("TaskQueueuShm");
+        std::cout << "Hejka" << std::endl;
+        segment = new managed_shared_memory(create_only, "TaskQueueuShm", 65536);
+        alloc_inst = new ShmemAllocator (segment->get_segment_manager());
+        shared_memory_history = segment->construct<ShmVector>("SharedVector")(*alloc_inst);
+        for (int i = 0; i < 10; ++i)
+        {
+          shared_memory_history->push_back(i);
+        }
+      }
+      return (socket_fd != -1 && rc == 0);
     }
     void SingletonProcess::connectToSocket(std::string task)
     {
@@ -75,3 +95,4 @@ SingletonProcess::SingletonProcess(uint16_t port0)
       
       return buffer;
     }
+    

@@ -10,6 +10,11 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <fstream>
+#include <sys/stat.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+using namespace boost::interprocess;
 
 void TaskQueue::saveOutputToFile(std::string LogName)
 {
@@ -17,7 +22,7 @@ void TaskQueue::saveOutputToFile(std::string LogName)
   outfile.open(LogName);
 }
 
-int TaskQueue::startTask(std::string Task, std::string logName)
+int TaskQueue::startTask(std::string Task, historyEntry &entry)
 {
   
   pid_t pid;
@@ -29,12 +34,21 @@ int TaskQueue::startTask(std::string Task, std::string logName)
       std::cout << "Error in fork";
   }
   else if ( pid == 0 )
-  { 
+  {                                  
+                  
     std::cout << "Child process: My process id = " << getpid() << std::endl;
     std::cout << "Child process: Value returned by fork() = " << pid << std::endl;
 
-    Task = Task + " > " + logName;
+    Task = Task + " > " + entry.logFile;
     int return_value = system(Task.c_str());
+    managed_shared_memory segment(open_only, "TaskQueueuShm");
+    ShmVector *myvector = segment.find<ShmVector>("SharedVector").first;
+    for (auto it = myvector->begin(); it != myvector->end(); it++)
+    {
+      // std::cout << *it << std::endl;
+      ++(*it);
+    }
+    segment.destroy<ShmVector>("MyVector");
     exit(return_value);
   }
   else
@@ -79,7 +93,7 @@ void TaskQueue::historyEntryCreate(std::string Task)
     entry.state = "queued";
     entry.logFile = "/tmp/" + logName + ".out";
     history.push_back(entry);
-    startTask(Task, entry.logFile);
+    startTask(Task, entry);
 }
 
 
@@ -94,4 +108,15 @@ std::string historyEntry::printEntry()
 
 TaskQueue::~TaskQueue()
 {
+}
+void TaskQueue::lock()
+{
+  while (mkdir("/tmp/LockTaskQueue",  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
+  {
+    usleep(50);
+  }
+}
+void TaskQueue::unlock()
+{
+  rmdir("/tmp/LockTaskQueue");
 }
