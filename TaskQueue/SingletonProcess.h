@@ -28,7 +28,7 @@ public:
     
     TaskQueue *queue;
 private:
-    
+    bool is_singleton;
     int socket_fd = -1;
     int rc;
     uint16_t port;
