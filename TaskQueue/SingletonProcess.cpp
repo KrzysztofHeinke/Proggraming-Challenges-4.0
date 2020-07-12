@@ -45,7 +45,6 @@ bool SingletonProcess::operator()()
     }
     else
     {   
-      std::cout << "HEJKTA2" << std::endl;
       struct sockaddr_in name;
       name.sin_family = AF_INET;
       name.sin_port = htons (port);
@@ -57,14 +56,10 @@ bool SingletonProcess::operator()()
   if (is_singleton)
   {
     shared_memory_object::remove("TaskQueueuShm");
-    std::cout << "Hejka" << std::endl;
+    std::cout << "TaskQueue Initialized" << std::endl;
     segment = new managed_shared_memory(create_only, "TaskQueueuShm", 65536);
     alloc_inst = new ShmemAllocator (segment->get_segment_manager());
     shared_memory_history = segment->construct<ShmVector>("SharedVector")(*alloc_inst);
-    for (int i = 0; i < 10; ++i)
-    {
-      shared_memory_history->push_back(i);
-    }
   }
   return is_singleton;
 }

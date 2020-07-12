@@ -31,7 +31,7 @@ int TaskQueue::startTask(std::string Task, historyEntry &entry)
 
   if ( pid == -1 )
   {
-      std::cout << "Error in fork";
+    std::cout << "Error in fork";
   }
   else if ( pid == 0 )
   {                                  
@@ -43,12 +43,7 @@ int TaskQueue::startTask(std::string Task, historyEntry &entry)
     int return_value = system(Task.c_str());
     managed_shared_memory segment(open_only, "TaskQueueuShm");
     ShmVector *myvector = segment.find<ShmVector>("SharedVector").first;
-    for (auto it = myvector->begin(); it != myvector->end(); it++)
-    {
-      // std::cout << *it << std::endl;
-      ++(*it);
-    }
-    segment.destroy<ShmVector>("MyVector");
+    myvector->push_back(entry);
     exit(return_value);
   }
   else
@@ -62,38 +57,36 @@ int TaskQueue::startTask(std::string Task, historyEntry &entry)
 
 TaskQueue::TaskQueue()
 {
-    srand(time(NULL));
+  srand(time(NULL));
 }
 void randomLogName(std::string &logName)
 {
-    constexpr int logLetterAmount = 8;
-    char letters[] = {'a','b','c','d','e','f',
-    'g','h','i','j','k','l','m','n','o','p','q',
-    'r','s','t','u','v','w','x','y','z'};
-
-    for (int i = 0; i < logLetterAmount; i++)
-    {
-        logName.append(std::string(1, letters[rand() % (sizeof(letters)/sizeof(char))]));
-    }
-
+  constexpr int logLetterAmount = 8;
+  char letters[] = {'a','b','c','d','e','f',
+  'g','h','i','j','k','l','m','n','o','p','q',
+  'r','s','t','u','v','w','x','y','z'};
+  for (int i = 0; i < logLetterAmount; i++)
+  {
+      logName.append(std::string(1, letters[rand() % (sizeof(letters)/sizeof(char))]));
+  }
 }
 void TaskQueue::historyEntryCreate(std::string Task)
 {
-    historyEntry entry;
-    std::string logName;
-    randomLogName(logName);
+  historyEntry entry;
+  std::string logName;
+  randomLogName(logName);
 
-    std::stringstream ss;
-    auto time = std::chrono::system_clock::now();
-    auto time_ = std::chrono::system_clock::to_time_t(time);
-    ss << time_ ;
-    entry.number = history.size() + 1;
-    entry.command = Task;
-    entry.startTime = ss.str();
-    entry.state = "queued";
-    entry.logFile = "/tmp/" + logName + ".out";
-    history.push_back(entry);
-    startTask(Task, entry);
+  std::stringstream ss;
+  auto time = std::chrono::system_clock::now();
+  auto time_ = std::chrono::system_clock::to_time_t(time);
+  ss << time_ ;
+  entry.number = history.size() + 1;
+  entry.command = Task;
+  entry.startTime = ss.str();
+  entry.state = "queued";
+  entry.logFile = "/tmp/" + logName + ".out";
+  history.push_back(entry);
+  startTask(Task, entry);
 }
 
 

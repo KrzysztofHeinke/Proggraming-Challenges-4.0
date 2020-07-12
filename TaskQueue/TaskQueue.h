@@ -5,10 +5,7 @@
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 
-using namespace boost::interprocess;
-typedef allocator<int, managed_shared_memory::segment_manager>  ShmemAllocator;
-typedef std::vector<int, ShmemAllocator> ShmVector;
-
+//TODO: chagne strings to pointers because becase of POD.
 struct historyEntry
 {   
     std::string printEntry();
@@ -22,6 +19,12 @@ struct historyEntry
     std::string date;
     std::string state;
 };
+
+using namespace boost::interprocess;
+typedef allocator<historyEntry, managed_shared_memory::segment_manager>  ShmemAllocator;
+typedef std::vector<historyEntry, ShmemAllocator> ShmVector;
+
+
 
 class TaskQueue
 {

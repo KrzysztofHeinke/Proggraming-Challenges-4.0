@@ -8,8 +8,8 @@
 #include <boost/interprocess/allocators/allocator.hpp>
 
 using namespace boost::interprocess;
-typedef allocator<int, managed_shared_memory::segment_manager>  ShmemAllocator;
-typedef std::vector<int, ShmemAllocator> ShmVector;
+typedef allocator<historyEntry, managed_shared_memory::segment_manager>  ShmemAllocator;
+typedef std::vector<historyEntry, ShmemAllocator> ShmVector;
 
 
 class SingletonProcess

@@ -45,15 +45,20 @@ int main(int argc, char * argv[])
 
     while (true)
     {
-      
       data = singleton.listenForTask();
+      if ( data.length() == 3 && !data.find("-k"))
+      {
+        return -1;
+      }
       if (data.length() > 0)
       {     
         singleton.queue->historyEntryCreate(data);
         printHistory(singleton);
         for ( auto it = singleton.shared_memory_history->begin(); it != singleton.shared_memory_history->end(); ++it)
         {
-          std::cout << *it << std::endl;
+          std::cout << (*it).number << std::endl;
+          std::cout << (*it).exitNumber << std::endl;
+          std::cout << (*it).logFile << std::endl;
         }
       }
       else if ( data.length() == 0 )
