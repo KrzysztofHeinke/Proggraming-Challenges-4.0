@@ -24,10 +24,10 @@ void TaskQueue::saveOutputToFile(std::string LogName)
 
 int TaskQueue::startTask(std::string Task, historyEntry &entry)
 {
-  
-  pid_t pid;
   std::cout << "My process id = " << getpid() << std::endl;
-  pid = fork();
+  std::string *state_finished = new std::string("finished");
+  std::string *state_running = new std::string("running");
+  pid_t pid = fork();
 
   if ( pid == -1 )
   {
@@ -39,11 +39,16 @@ int TaskQueue::startTask(std::string Task, historyEntry &entry)
     std::cout << "Child process: My process id = " << getpid() << std::endl;
     std::cout << "Child process: Value returned by fork() = " << pid << std::endl;
 
-    Task = Task + " > " + entry.logFile;
-    int return_value = system(Task.c_str());
+    Task = Task + " > " + *entry.logFile;
     managed_shared_memory segment(open_only, "TaskQueueuShm");
     ShmVector *myvector = segment.find<ShmVector>("SharedVector").first;
-    myvector->push_back(entry);
+    (*myvector)[entry.number].state = state_running;
+    //Task running
+    int return_value = system(Task.c_str());
+    (*myvector)[entry.number].exitNumber = return_value;
+    (*myvector)[entry.number].state = state_finished;
+    // (*myvector)[entry.number].endTime = new std::string("finished");
+    // (*myvector)[entry.number].duration = new std::string("finished");
     exit(return_value);
   }
   else
@@ -80,22 +85,29 @@ void TaskQueue::historyEntryCreate(std::string Task)
   auto time = std::chrono::system_clock::now();
   auto time_ = std::chrono::system_clock::to_time_t(time);
   ss << time_ ;
-  entry.number = history.size() + 1;
-  entry.command = Task;
-  entry.startTime = ss.str();
-  entry.state = "queued";
-  entry.logFile = "/tmp/" + logName + ".out";
+  entry.number = history.size();
+  entry.command = new std::string(Task);
+  entry.startTime = new std::string(ss.str());
+  entry.endTime = new std::string("not finished");
+  entry.duration = new std::string("not finished");
+  entry.state = new std::string("queued");
+  entry.date = new std::string("");
+  entry.logFile = new std::string( "/tmp/" + logName + ".out");
   history.push_back(entry);
+  
+  managed_shared_memory segment(open_only, "TaskQueueuShm");
+  ShmVector *myvector = segment.find<ShmVector>("SharedVector").first;
+  myvector->push_back(entry);
   startTask(Task, entry);
 }
 
 
-std::string historyEntry::printEntry()
+std::string* historyEntry::printEntry()
 {
-  return (std::to_string(this->number) + " " + std::to_string(this->exitNumber) + " " + this->logFile + " " + 
-  this->startTime + " " + this->endTime + " " + this->time + " " + 
-  this->command + " " + this->date + " " + this->state );
-  
+  return new std::string((std::to_string(this->number) + " " + std::to_string(this->exitNumber) + " " + *this->logFile + " " + 
+  *this->startTime + " " + *this->endTime + " " + *this->duration + " " + 
+  *this->command + " " + *this->date + " " + *this->state ));
+
 }
 
 

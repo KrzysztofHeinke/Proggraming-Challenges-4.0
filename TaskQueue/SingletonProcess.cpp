@@ -41,7 +41,7 @@ bool SingletonProcess::operator()()
     queue = new TaskQueue;
     if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        throw std::runtime_error(std::string("Could not create socket: ") +  strerror(errno));
+      throw std::runtime_error(std::string("Could not create socket: ") +  strerror(errno));
     }
     else
     {   

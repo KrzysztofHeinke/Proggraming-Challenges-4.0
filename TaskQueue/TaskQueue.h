@@ -4,20 +4,20 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
-
-//TODO: chagne strings to pointers because becase of POD.
+#include <memory>
 struct historyEntry
 {   
-    std::string printEntry();
+    std::string *printEntry();
     int number;
     int exitNumber;
-    std::string logFile;
-    std::string startTime;
-    std::string endTime;
-    std::string time;
-    std::string command;
-    std::string date;
-    std::string state;
+
+    std::string *logFile;
+    std::string *startTime;
+    std::string *endTime;
+    std::string *duration;
+    std::string *command;
+    std::string *date;
+    std::string *state;
 };
 
 using namespace boost::interprocess;

@@ -8,16 +8,16 @@
 
 using namespace boost::interprocess;
 
+typedef allocator<historyEntry, managed_shared_memory::segment_manager>  ShmemAllocator;
+typedef std::vector<historyEntry, ShmemAllocator> ShmVector;
+
 void printHistory(SingletonProcess &singleton)
 {
   system("echo \"Task number, exit status, Log localization, date, command, status\" > /tmp/TaskHistory.txt");
-  for (auto it = singleton.queue->history.begin(); it != singleton.queue->history.end(); ++it)
+  for ( auto it = singleton.shared_memory_history->begin(); it != singleton.shared_memory_history->end(); ++it)
   {
-    if ((singleton.queue->history.size()) != 0)
-    {
-      system(("echo \"" + it->printEntry() + "\" >> /tmp/TaskHistory.txt").c_str());
-      std::cout << it->printEntry() << std::endl;
-    }
+    std::cout << (*it).number << " " << (*it).exitNumber << " " << *(*it).logFile << " " << *(*it).date << " " << *(*it).command << " " << *(*it).state << " " << std::endl;
+    system((("echo \"" + std::to_string((*it).number)) + " " + std::to_string((*it).exitNumber) + " " + *(*it).logFile + " " + *(*it).date + " " + *(*it).command + " " + *(*it).state + "\" >> /tmp/TaskHistory.txt" ).c_str());
   }
 }
 
@@ -42,30 +42,24 @@ int main(int argc, char * argv[])
       
       return 0;
     }
-
+    
     while (true)
     {
       data = singleton.listenForTask();
+      if ( data.length() <= 1)
+      {
+        printHistory(singleton);
+      }
       if ( data.length() == 3 && !data.find("-k"))
       {
+        std::cout << "TaskQueue killed" << std::endl;
         return -1;
       }
       if (data.length() > 0)
       {     
         singleton.queue->historyEntryCreate(data);
         printHistory(singleton);
-        for ( auto it = singleton.shared_memory_history->begin(); it != singleton.shared_memory_history->end(); ++it)
-        {
-          std::cout << (*it).number << std::endl;
-          std::cout << (*it).exitNumber << std::endl;
-          std::cout << (*it).logFile << std::endl;
-        }
       }
-      else if ( data.length() == 0 )
-      {
-        // printHistory(singleton);
-      }
-      
     }
     
     return 0;
