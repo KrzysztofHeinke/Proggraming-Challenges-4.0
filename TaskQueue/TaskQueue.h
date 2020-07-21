@@ -7,7 +7,6 @@
 #include <memory>
 struct historyEntry
 {   
-    std::string *printEntry();
     int number;
     int exitNumber;
 
@@ -24,8 +23,6 @@ using namespace boost::interprocess;
 typedef allocator<historyEntry, managed_shared_memory::segment_manager>  ShmemAllocator;
 typedef std::vector<historyEntry, ShmemAllocator> ShmVector;
 
-
-
 class TaskQueue
 {
 private:
@@ -33,8 +30,6 @@ private:
 public:
     void saveOutputToFile(std::string Logname);
     std::vector <historyEntry> history;
-    std::vector <historyEntry> queued;
-    std::vector <historyEntry> finished;
     void lock();
     void unlock();
     TaskQueue();
@@ -42,5 +37,3 @@ public:
     void historyEntryCreate(std::string Task);
     ~TaskQueue();
 };
-
-

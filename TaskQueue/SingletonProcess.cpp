@@ -4,8 +4,6 @@
 #include <iostream>
 #include "SingletonProcess.h"
 #include <string>
-#include <sys/ipc.h>
-#include <sys/shm.h>
 
 SingletonProcess::SingletonProcess(uint16_t port0)
   : socket_fd(-1), rc(1), port(port0)
@@ -70,7 +68,7 @@ void SingletonProcess::connectToSocket(std::string task)
   name.sin_port = htons (port);
   name.sin_addr.s_addr = htonl (INADDR_ANY);
   rc = connect(socket_fd, (struct sockaddr *) &name, sizeof (name));
-  std::cout << send(socket_fd, task.c_str() , strlen(task.c_str()) , 0 ) << std::endl;
+  send(socket_fd, task.c_str() , strlen(task.c_str()) , 0 );
 }
 std::string SingletonProcess::listenForTask()
 {
