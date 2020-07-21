@@ -4,15 +4,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <random>
-#include "TaskQueue.h"
 #include <chrono>
 #include <sstream>
 #include <stdio.h>
 #include <fcntl.h>
 #include <fstream>
 #include <sys/stat.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#include "TaskQueue.h"
 
 using namespace boost::interprocess;
 
@@ -24,7 +22,9 @@ void TaskQueue::saveOutputToFile(std::string LogName)
 
 int TaskQueue::startTask(std::string Task, historyEntry &entry)
 {
+  #ifdef DEBUG
   std::cout << "My process id = " << getpid() << std::endl;
+  #endif
   std::string *state_finished = new std::string("finished");
   std::string *state_running = new std::string("running");
   pid_t pid = fork();
@@ -34,27 +34,39 @@ int TaskQueue::startTask(std::string Task, historyEntry &entry)
     std::cout << "Error in fork";
   }
   else if ( pid == 0 )
-  {                                  
-                  
+  {               
+    #ifdef DEBUG                   
     std::cout << "Child process: My process id = " << getpid() << std::endl;
     std::cout << "Child process: Value returned by fork() = " << pid << std::endl;
-
+    #endif
     Task = Task + " > " + *entry.logFile;
     managed_shared_memory segment(open_only, "TaskQueueuShm");
     ShmVector *myvector = segment.find<ShmVector>("SharedVector").first;
+    while( true )
+    {
+      if ( myvector->size() == 1)
+      {
+        break;
+      }
+      if ( *(*myvector)[entry.number - 1].state == "finished")
+      {
+        break;
+      }
+    }
+  
     (*myvector)[entry.number].state = state_running;
     //Task running
     int return_value = system(Task.c_str());
     (*myvector)[entry.number].exitNumber = return_value;
     (*myvector)[entry.number].state = state_finished;
-    // (*myvector)[entry.number].endTime = new std::string("finished");
-    // (*myvector)[entry.number].duration = new std::string("finished");
     exit(return_value);
   }
   else
   {
+    #ifdef DEBUG
     std::cout << "Parent process. My process id = " << getpid() << std::endl;
     std::cout << "Parent process. Value returned by fork() = " << pid << std::endl;
+    #endif
   }
 
   return 0;
@@ -101,16 +113,6 @@ void TaskQueue::historyEntryCreate(std::string Task)
   startTask(Task, entry);
 }
 
-
-std::string* historyEntry::printEntry()
-{
-  return new std::string((std::to_string(this->number) + " " + std::to_string(this->exitNumber) + " " + *this->logFile + " " + 
-  *this->startTime + " " + *this->endTime + " " + *this->duration + " " + 
-  *this->command + " " + *this->date + " " + *this->state ));
-
-}
-
-
 TaskQueue::~TaskQueue()
 {
 }
@@ -121,6 +123,7 @@ void TaskQueue::lock()
     usleep(50);
   }
 }
+
 void TaskQueue::unlock()
 {
   rmdir("/tmp/LockTaskQueue");
