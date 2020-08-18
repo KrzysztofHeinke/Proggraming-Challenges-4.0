@@ -60,10 +60,10 @@ class my_unique_ptr
 template <class T>
 my_unique_ptr<T> make_unique(T*&& data)
 {
-    return my_unique_ptr<T>( std::move(data));
+    return my_unique_ptr<T>( std::move(data) );
 }
 template <class T>
 my_unique_ptr<T> make_unique(T& data)
 {
-    return my_unique_ptr<T>( std::move(data));
+    return my_unique_ptr<T>( std::move(data) );
 }
