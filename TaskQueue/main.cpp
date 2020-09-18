@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/thread.hpp>
+#include <memory>
 using namespace boost::interprocess;
 
 typedef allocator<historyEntry, managed_shared_memory::segment_manager>  ShmemAllocator;
@@ -59,6 +60,7 @@ int main(int argc, char * argv[])
       if ( data.length() == 3 && !data.find("-k"))
       {
         std::cout << "TaskQueue killed" << std::endl;
+        singleton.~SingletonProcess();
         t1.interrupt();
         return -1;
       }

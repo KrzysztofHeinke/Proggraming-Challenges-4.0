@@ -20,6 +20,7 @@ SingletonProcess::~SingletonProcess()
         shared_memory_object::remove("TaskQueueuShm");
         delete segment;
         delete alloc_inst;
+        delete shared_memory_history;
       }
     }
     delete queue;

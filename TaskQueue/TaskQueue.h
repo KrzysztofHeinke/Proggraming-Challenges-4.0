@@ -7,6 +7,7 @@
 #include <memory>
 struct historyEntry
 {   
+    historyEntry();
     int number;
     int exitNumber;
 
@@ -17,6 +18,7 @@ struct historyEntry
     std::string *command;
     std::string *date;
     std::string *state;
+    ~historyEntry();
 };
 
 using namespace boost::interprocess;

@@ -14,6 +14,28 @@
 
 using namespace boost::interprocess;
 
+historyEntry::historyEntry()
+{
+  std::string *logFile = nullptr;
+  std::string *startTime = nullptr;
+  std::string *endTime = nullptr;
+  std::string *duration = nullptr;
+  std::string *command = nullptr;
+  std::string *date = nullptr;
+  std::string *state = nullptr;
+}
+
+historyEntry::~historyEntry()
+{
+  delete logFile;
+  delete startTime;
+  delete endTime;
+  delete duration;
+  delete command;
+  delete date;
+  delete state;
+}
+
 void TaskQueue::saveOutputToFile(std::string LogName)
 {
   std::ofstream outfile;
@@ -115,6 +137,10 @@ void TaskQueue::historyEntryCreate(std::string Task)
 
 TaskQueue::~TaskQueue()
 {
+  for (auto it = history.begin(); it != history.end(); ++it)
+  {
+    it->~historyEntry();
+  }
 }
 void TaskQueue::lock()
 {
