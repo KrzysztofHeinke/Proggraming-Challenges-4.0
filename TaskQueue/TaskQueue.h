@@ -11,13 +11,13 @@ struct historyEntry
     int number;
     int exitNumber;
 
-    std::string *logFile;
-    std::string *startTime;
-    std::string *endTime;
-    std::string *duration;
-    std::string *command;
-    std::string *date;
-    std::string *state;
+    std::shared_ptr<std::string> logFile;
+    std::shared_ptr<std::string> startTime;
+    std::shared_ptr<std::string> endTime;
+    std::shared_ptr<std::string> duration;
+    std::shared_ptr<std::string> command;
+    std::shared_ptr<std::string> date;
+    std::shared_ptr<std::string> state;
     ~historyEntry();
 };
 
@@ -35,6 +35,7 @@ public:
     void lock();
     void unlock();
     TaskQueue();
+    void printHistory();
     int startTask(std::string Task, historyEntry &entry);
     void historyEntryCreate(std::string Task);
     ~TaskQueue();

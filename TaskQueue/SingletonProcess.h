@@ -15,9 +15,9 @@ typedef std::vector<historyEntry, ShmemAllocator> ShmVector;
 class SingletonProcess
 {
 public:
-    managed_shared_memory *segment;
-    const ShmemAllocator *alloc_inst;
-    ShmVector *shared_memory_history;
+    std::unique_ptr<managed_shared_memory> segment;
+    std::shared_ptr<const ShmemAllocator> alloc_inst;
+    ShmVector* shared_memory_history;
 
     SingletonProcess(uint16_t port0);
     ~SingletonProcess();
@@ -26,7 +26,7 @@ public:
     std::string listenForTask();
     bool operator()();
     
-    TaskQueue *queue;
+    std::unique_ptr<TaskQueue> queue;
 private:
     bool is_singleton;
     int socket_fd = -1;
