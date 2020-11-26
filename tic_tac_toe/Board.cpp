@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include "Board.hpp"
+#include "VideoHandler.hpp"
 
 char Player::get_sign()
 {
@@ -22,6 +23,14 @@ void Board::putSignAtPosition(Player player)
         if ( mBoard[x][y] == '-')
         {
             mBoard[x][y] = player.get_sign();
+            if (player.get_sign() == 'x')
+            {
+                video.drawCross(x, y);
+            }
+            else if( player.get_sign() == 'o')
+            {
+                video.drawCircle(x,y);
+            }
             if(checkIfSomeoneWon())
             {
                 printBoard();

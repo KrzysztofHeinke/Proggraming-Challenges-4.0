@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include "VideoHandler.hpp"
 
 class Player
 {
@@ -17,6 +18,7 @@ class Board
     std::vector <std::vector<char>> mBoard {{'-','-','-'},{'-','-','-'},{'-','-','-'}};
     int oScore {0};
     int xScore {0};
+    VideoHandling video{800,600};
     public:
     void putSignAtPosition(Player player);
     void printBoard();
