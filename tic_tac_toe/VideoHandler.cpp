@@ -62,7 +62,11 @@ sf::Vector2f VideoHandling::get_coordinates(int x, int y)
 {
     return coordinates[x][y];
 }
-
+void VideoHandling::cleanBoard()
+{
+    applicationWindow->clear();
+    drawBoard();
+}
 void VideoHandling::display()
 {
     applicationWindow->display();

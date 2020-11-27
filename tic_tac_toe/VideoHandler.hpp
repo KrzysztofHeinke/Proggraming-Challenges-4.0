@@ -11,6 +11,7 @@
 #include <SFML/Window/Window.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 #include "ThickLine.hpp"
 class VideoHandling
 {
@@ -30,6 +31,11 @@ class VideoHandling
     void drawCircle(int x, int y);
     sf::Vector2f get_coordinates(int x, int y);
     void display();
+    void cleanBoard();
+    std::unique_ptr<sf::RenderWindow> &get_window()
+    {
+        return applicationWindow;
+    }
     ~VideoHandling()
     {}
 };

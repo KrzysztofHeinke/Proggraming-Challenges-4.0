@@ -1,3 +1,4 @@
+#include <SFML/Window/Event.hpp>
 #include <iostream>
 #include <iterator>
 #include <utility>
@@ -18,7 +19,7 @@ class Board
     std::vector <std::vector<char>> mBoard {{'-','-','-'},{'-','-','-'},{'-','-','-'}};
     int oScore {0};
     int xScore {0};
-    VideoHandling video{800,600};
+    VideoHandling video{800,800};
     public:
     void putSignAtPosition(Player player);
     void printBoard();
