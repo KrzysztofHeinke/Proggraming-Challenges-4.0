@@ -13,6 +13,7 @@ namespace sf
 		public :
 
 		explicit LineShape(const Vector2f& point1, const Vector2f& point2);
+                LineShape();
 
 		void setThickness(float thickness);
 

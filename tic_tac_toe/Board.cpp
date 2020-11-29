@@ -55,9 +55,22 @@ void Board::putSignAtPosition(Player player)
             }
             if(checkIfSomeoneWon())
             {
+                video.display();
+                while(video.get_window()->waitEvent(event)) 
+                {
+                    if (event.type == sf::Event::MouseButtonPressed)
+                    {
+                        break;
+                    }
+                }
                 printBoard();
                 cleanBoard();
                 video.cleanBoard();
+                video.drawPoints(xScore, oScore);
+            }
+            else
+            {
+                video.display();
             }
             break;
         }
@@ -100,6 +113,7 @@ char Board::checkThree(std::vector<char> pList)
 
 bool Board::checkRows()
 {
+    int i = 0;
     for ( auto &x: mBoard )
     {
         char result = checkThree(x);
@@ -107,6 +121,7 @@ bool Board::checkRows()
         {
            ++oScore;
            std::cout << "O player have won" << std::endl;
+           video.drawWiningHorizontal(i);
            std::cout << "O player have: " << oScore << " points X player have: " << xScore << std::endl;
            return true;
         }
@@ -114,14 +129,17 @@ bool Board::checkRows()
         {
            ++xScore;
            std::cout << "X player have won" << std::endl;
+           video.drawWiningHorizontal(i);
            std::cout << "O player have: " << oScore << " points X player have: " << xScore << std::endl;
            return true;
         }
+        ++i;
     }
     return false;
 }
 bool Board::checkCoulmuns()
 {
+    int j = 0;
     for (int i = 0; i <= 2; ++i)
     {
         char result = checkThree(std::vector<char> {mBoard[0][i], mBoard[1][i], mBoard[2][i]});
@@ -129,6 +147,7 @@ bool Board::checkCoulmuns()
         {
            ++oScore;
            std::cout << "O player have: " << oScore << " points X player have: " << xScore << std::endl;
+           video.drawWiningVertical(i);
            std::cout << "O player have won" << std::endl;
            return true;
         }
@@ -136,9 +155,11 @@ bool Board::checkCoulmuns()
         {
            ++xScore;
            std::cout << "O player have: " << oScore << " points X player have: " << xScore << std::endl;
+           video.drawWiningVertical(i);
            std::cout << "X player have won" << std::endl;
            return true;
         }
+        ++j;
     }
     return false;
 }
@@ -148,6 +169,14 @@ bool Board::checkSlashes()
     char result_backSlash = checkThree(std::vector<char> {mBoard[0][2],mBoard[1][1],mBoard[2][0]});
     if( result_backSlash == 'o' || result_frowardSlash == 'o')
     {
+       if(result_backSlash != 'o')
+       {
+           video.drawWiningBackslash();
+       }
+       else
+       {
+           video.drawWiningForwardslash();
+       }
        ++oScore;
        std::cout << "O player have: " << oScore << "X player have: " << xScore << std::endl;
        std::cout << "O player have won" << std::endl;
@@ -155,6 +184,14 @@ bool Board::checkSlashes()
     }
     else if( result_backSlash == 'x' || result_frowardSlash == 'x' )
     {
+       if(result_backSlash != 'x')
+       {
+           video.drawWiningBackslash();
+       }
+       else
+       {
+           video.drawWiningForwardslash();
+       }
        ++xScore;
        std::cout << "O player have: " << oScore << " points X player have: " << xScore << " points." << std::endl;
        std::cout << "X player have won" << std::endl;

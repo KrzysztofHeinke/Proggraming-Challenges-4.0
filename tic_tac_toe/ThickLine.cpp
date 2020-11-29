@@ -12,7 +12,7 @@ LineShape::LineShape(const Vector2f& point1, const Vector2f& point2):
     setPosition(point1);
     setThickness(2.f);    
 }
-
+LineShape::LineShape() {}
 
 void LineShape::setThickness(float thickness)
 {

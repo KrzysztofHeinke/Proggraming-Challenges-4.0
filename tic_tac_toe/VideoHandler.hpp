@@ -27,6 +27,12 @@ class VideoHandling
     public:
     VideoHandling(int wHeight, int wWitdh);
     void drawBoard();
+    void drawWiningBackslash();
+    void drawWiningForwardslash();
+    void drawWiningHorizontal(int whichLine);
+    void drawWiningVertical(int whichLine);
+    void drawPlayerTurn(char sign);
+    void drawPoints(int x, int o);
     void drawCross(int x, int y);
     void drawCircle(int x, int y);
     sf::Vector2f get_coordinates(int x, int y);
